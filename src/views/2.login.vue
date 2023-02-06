@@ -1,11 +1,16 @@
 <template>
   <div class="login-container">
-    <el-form class="login-form">
+    <el-form
+      class="login-form"
+      :model="loginForm"
+      :rules="loginRules"
+      ref="loginFormRef"
+    >
       <div class="title-container">
         <h3 class="title">用户登录</h3>
       </div>
       <!-- username -->
-      <el-form-item>
+      <el-form-item prop="username">
         <span class="svg-container">
           <SvgIcon icon="https://res.lgdsunday.club/user.svg"></SvgIcon>
         </span>
@@ -13,20 +18,31 @@
           placeholder="username"
           name="username"
           type="text"
-          value="1223456"
+          v-model="loginForm.username"
         ></el-input>
       </el-form-item>
       <!-- password -->
-      <el-form-item>
+      <el-form-item prop="password">
         <span class="svg-container">
           <SvgIcon icon="password"></SvgIcon>
         </span>
-        <el-input placeholder="password" name="password"></el-input>
-        <span class="show-pwd">
-          <SvgIcon icon="show"></SvgIcon>
+        <el-input
+          placeholder="password"
+          name="password"
+          v-model="loginForm.password"
+          v-bind:type="passwordType"
+        ></el-input>
+        <span class="show-pwd" @click="onChangePwdType">
+          <SvgIcon
+            :icon="passwordType == 'password' ? 'hide' : 'show'"
+          ></SvgIcon>
         </span>
       </el-form-item>
-      <el-button type="primary" style="width: 100%; margin-bottom: 30px"
+      <el-button
+        @click="handlerLogin"
+        :loading="loading"
+        type="primary"
+        style="width: 100%; margin-bottom: 30px"
         >登录</el-button
       >
     </el-form>
@@ -39,8 +55,74 @@
 </template>
 
 <script setup lang="ts">
-import { Avatar } from "@element-plus/icons-vue";
 import SvgIcon from "@/components/SvgIcon/index.vue";
+import { FormRules, FormInstance } from "element-plus";
+import { ref, onMounted, reactive } from "vue";
+import { validatePassword } from "../utils/rules";
+
+import useStore from "@/store/index";
+
+import { storeToRefs, mapActions } from "pinia";
+
+const { user } = useStore();
+
+onMounted(() => {});
+
+const loginForm = ref({
+  username: "super-admin",
+  password: "123456",
+});
+
+const loginRules = ref<FormRules>({
+  username: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "用户名为必填项",
+    },
+  ],
+  password: [
+    {
+      required: true,
+      trigger: "blur",
+      validator: validatePassword(),
+    },
+  ],
+});
+
+// 密码框文本显示
+const passwordType = ref("password");
+const onChangePwdType = () => {
+  if (passwordType.value == "password") {
+    passwordType.value = "text";
+  } else {
+    passwordType.value = "password";
+  }
+};
+
+const loading = ref(false);
+const loginFormRef = ref<FormInstance>();
+
+// 登录
+const handlerLogin = () => {
+  console.log("进入了点击事件");
+
+  loginFormRef.value?.validate((valid) => {
+    if (!valid) return;
+    loading.value = true;
+    user
+      .login(loginForm.value)
+      .then(() => {
+        console.log(123);
+      })
+      .catch(() => {
+        console.log(321);
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  });
+};
 </script>
 
 <style lang="scss" scoped>

@@ -157,3 +157,116 @@ app.mount('#app')
 <SvgIcon icon="password"></SvgIcon>
 ```
 
+
+
+
+
+### 2.对请求进行统一管理
+
+需求: 在开发和生产环境上 所需要使用的接口可能不同 需要分辨开发和生产环境
+
+本案例涉及 ==src/config/index.ts== | ==vite.confit.ts== | ==src/utlis/requests.ts== |  ==src/api/sys.ts== | 
+
+
+
+
+
+#### 2.1 使用import.meta.env.MODE(vite) 来获取当前环境 并根据当前环境 抛出对应的baseApi和mockApi
+
+> baseApi是以当前用户的网址+/api作为路径使用  例 localhost:8080/api
+
+```
+//src/config/index.ts
+
+import { EnvConfigI, EnvConfigKey } from "./indexTs"
+const env: string = import.meta.env.MODE || "prod"
+
+const EnvConfig: EnvConfigI = {
+    development: {
+        baseApi: "/api",
+        mockApi: ""
+    },
+    production: {
+        baseApi: "/api",
+        mockApi: ""
+    }
+}
+
+const EnvConfigItem: Partial<{ [P in keyof EnvConfigI]: EnvConfigI[P] }> = EnvConfig[env]
+export default {
+    ...EnvConfigItem as { [P in EnvConfigKey]: string }
+}
+
+
+
+
+```
+
+
+
+#### 2.2 创建axios 并设置baseURL
+
+> 配置完baseURL之后 每次访问都不需要在路径上写/api
+
+```
+// src/utils/requests.ts
+
+import axios from "axios"
+import config from "../config"
+const service = axios.create({
+    baseURL: config.baseApi,
+    timeout: 5000
+})
+export default service
+
+```
+
+
+
+#### 2.3 接口统一管理
+
+```
+//src/api/sys.ts
+
+import request from "../utils/requests"
+
+export const login = (data: any) => {
+    return request({
+        url: '/sys/login',
+        method: "POST",
+        data
+    })
+}
+```
+
+
+
+#### 2.4 配置代理
+
+现在/api和/api后的路径都配置完毕了   /api/sys/login   现在的路径是这样的，但是前面的网址和域名不清楚，如果是在服务器上 不需要配置  直接使用就访问到服务器地址+/api/sys/login ,但如果是一个线上接口地址,访问本地地址肯定不对 ， 需要做代理去访问线上接口地址
+
+```
+vite.config.ts
+
+export default defineConfig({
+	....
+  server: {
+    port: 5173, //前端项目启动接口
+    proxy: {
+      "/api": {
+        target: "https://www.mislv.cn/", //线上接口地址
+        changeOrigin: true, //跨域？
+      }
+    },
+    https: false,
+    open: true,
+  },
+  	....
+  
+  })
+
+```
+
+
+
+#### 2.5 之后就可以正常访问线上接口地址 并且对接口进行统一管理

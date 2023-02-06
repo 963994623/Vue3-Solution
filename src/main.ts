@@ -8,8 +8,13 @@ import 'element-plus/dist/index.css'
 import 'virtual:svg-icons-register' // 引入注册脚本
 import svgIcon from "./components/SvgIcon/index.vue"
 
+import pinia from "@/store/store"
+
+
+
 const app = createApp(App)
 app.use(routers as any)
 app.use(ElementPlus)
+app.use(pinia)
 app.component('svg-icon', svgIcon)
 app.mount('#app')
