@@ -7,6 +7,8 @@ import demo33 from "../views/1.3.vue"
 
 import demo2Login from "../views/2.login.vue"
 
+import demo3 from "../layout/index.vue"
+
 
 
 const routes = [
@@ -29,6 +31,7 @@ const routes = [
         ]
     },
     { path: '/demo2Login', component: demo2Login },
+    { path: '/demo3', component: demo3 },
 
 ]
 

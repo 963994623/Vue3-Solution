@@ -6,7 +6,7 @@
 
 
 
-### 1 对svg图标进行全局引入并使用
+### 1 对svg图标进行全局引入并在组件中使用
 
 需求: element-plus 的icon图标不够满足需求 想用svg图标来代替
 
@@ -270,3 +270,126 @@ export default defineConfig({
 
 
 #### 2.5 之后就可以正常访问线上接口地址 并且对接口进行统一管理
+
+
+
+
+
+
+
+### 3.scss和js之间的共享变量
+
+需求: 想要在js内容中去更改或者使用scss的变量
+
+资料来源:https://blog.csdn.net/youyacoder/article/details/127364009
+
+本案例涉及 :  ==src/style/variables.module.scss==  | ==src/style/mixin.scss== |  ==src/layout/index.vue== | 
+
+
+
+#### 3.1 声明scss外部文件 
+
+> 文件名需要满足 *.module.scss   如果写成  不带.module  则不会被js识别
+
+```
+// src/style/variables.module.scss
+
+//编写完 scss变量时候 通过 :export导出
+
+
+
+$menuText:#bfcbd9;
+$menuActiveText:#fff;
+$subMenuActiveText:#f4f4f5;
+
+$menuBg:#304156;
+$menuHover:#263445;
+
+$subMenuBg:#1f2d3d;
+$subMenuHover:#001528;
+
+$sideBarWidth:210px;
+
+:export{
+    menuText:$menuText;
+    menuActiveText:$menuActiveText;
+    subMenuActiveText:$subMenuActiveText;
+    menuBg:$menuBg;
+    menuHover:$menuHover;
+    subMenuBg:$subMenuBg;
+    subMenuHover:$subMenuHover;
+    sideBarWidth:$sideBarWidth
+
+}
+```
+
+
+
+#### 3.2在vue文件的js部分导入
+
+```
+//src/layout/index.vue
+
+
+<script lang="ts" setup>
+import configColor from "@/style/variables.module.scss";
+console.log(configColor); //此时他是个对象 和js中的对象是一样的 可以 configColor.*** 来使用变量
+</script>
+```
+
+
+
+
+
+#### 3.扩展
+
+> 关于scss 的mixin 部分
+
+下面定义了一个外部scss文件 使用了scss的mixin  将一些固定的样式打包 并可以被scss导入 使用
+
+```
+// src/style/mixin.scss
+//定义mixin
+
+@mixin clearfix{
+    &:after{
+        content: " ";
+        display: table;
+        clear: both;
+    }
+}
+@mixin scrollBar{
+    &::-webkit-scrollbar-track-piece{
+        background-color: #d3dce6;
+    }
+    &::-webkit-scrollbar{
+        width: 6px;
+    }
+    &::-webkit-scrollbar-thumb{
+        background-color: #99a9bf;
+        border-radius: 20px;
+    }
+}
+@mixin relative{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+```
+
+```
+//src/layout/index.vue
+
+//定义时使用@mixin  使用时用@include
+
+<style lang="scss" scoped>
+@import "@/style/mixin.scss";
+.app-wrapper {
+  @include clearfix;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+</style>
+```
+
