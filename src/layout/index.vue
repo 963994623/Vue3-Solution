@@ -1,11 +1,19 @@
 <template>
-  <div class="app-wrapper">
+  <div
+    class="app-wrapper"
+    :class="[app.sidebarOpenedGet ? 'openSidebar' : 'hideSidebar']"
+  >
     <!-- 左侧emun菜单 -->
     <Sidebar
       class="sidebar-container"
       :style="{ backgroundColor: configColor.menuBg }"
     ></Sidebar>
-    <div class="main-container">
+    <div
+      :class="[
+        'main-container',
+        app.sidebarOpenedGet ? 'marginLeft' : 'marginLeft-',
+      ]"
+    >
       <div class="fixed-header">
         <!-- 顶部navbar -->
         <Navbar></Navbar>
@@ -21,6 +29,8 @@ import configColor from "@/style/variables.module.scss";
 import Navbar from "./components/Navbar.vue";
 import Sidebar from "./components/Sidebar/index.vue";
 import AppMain from "./components/AppMain.vue";
+import pinia from "@/store";
+const { app } = pinia();
 
 console.log(configColor);
 </script>
@@ -29,6 +39,12 @@ console.log(configColor);
 @import "@/style/mixin.scss";
 @import "@/style/variables.module.scss";
 
+.marginLeft- {
+  margin-left: $hideSideBarWidth !important;
+}
+:deep(.el-sub-menu__title) {
+  padding-right: 0 !important;
+}
 .app-wrapper {
   @include clearfix;
   position: relative;
@@ -41,5 +57,9 @@ console.log(configColor);
   right: 0;
   z-index: 9;
   width: calc(100% - #{$sideBarWidth});
+  transition: width 0.28s;
+}
+.hideSidebar .fixed-header {
+  width: calc(100% - #{$hideSideBarWidth});
 }
 </style>

@@ -1,4 +1,6 @@
-<template><div class="app-main">我是主题内容</div></template>
+<template>
+  <div class="app-main">我是主题内容 <RouterView></RouterView></div>
+</template>
 
 <style lang="scss" scoped>
 .app-main {

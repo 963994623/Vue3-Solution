@@ -393,3 +393,122 @@ console.log(configColor); //此时他是个对象 和js中的对象是一样的 
 </style>
 ```
 
+
+
+
+
+### 4.element-plus Menu组件 伸缩方案
+
+element-plus menu组件中可以选择是否伸缩 但会出现一些小问题, 顺便配合pinia做案例
+
+
+
+#### 4.1  使用pinia 对menu的伸缩数据做存储
+
+
+
+```
+//src/store/modules/app.ts
+
+import { defineStore } from "pinia"
+export default defineStore("app", {
+    state: () => ({
+        sidebarOpened: true, //默认为true 展开
+    }),
+    actions: {
+        triggerSidebarOpened() {
+            this.sidebarOpened = !this.sidebarOpened //取反
+
+
+        }
+    },
+    getters: {
+        sidebarOpenedGet: (state) => state.sidebarOpened //计算属性
+    }
+})
+```
+
+
+
+
+
+#### 4.2 封装伸缩按钮组件
+
+```
+//src/components/hamburger/index.vue
+
+
+<template>
+  <div class="hamburger-container" @click="toggleClick">
+    <svgIcon :icon="icon" class="hamburger"></svgIcon>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import svgIcon from "../SvgIcon/index.vue";
+import { computed } from "vue";
+import pinia from "@/store";
+const { app } = pinia();
+
+const icon = computed(() => {
+  return app.sidebarOpenedGet ? "hideMenu" : "showMenu";
+});
+
+const toggleClick = () => {
+  app.triggerSidebarOpened();
+};
+</script>
+<style scoped lang="scss">
+.hamburger-container {
+  padding: 0 16px;
+  .hamburger {
+    display: inline-block;
+    vertical-align: middle;
+    width: 20px;
+    height: 20px;
+  }
+}
+</style>
+
+```
+
+
+
+
+
+#### 4.3  el-menu 绑定collapse
+
+```
+//src/layout/components/sidebar/sidebarMenu.vue
+
+<template>
+  <el-menu
+    :collapse="!app.sidebarOpenedGet"
+  >
+  </el-menu>
+</template>
+<script setup lang="ts">
+import pinia from "@/store/index";
+const { user, app } = pinia();
+
+</script>
+```
+
+
+
+#### 4.4 处理问题
+
+> 完成上述步骤 出现的问题
+
+##### menu组件内的item项收缩 但menu组件本身没伸缩
+
+解决 将menu的宽度设置 根据pinia的数据源的true和false 设置另外一个css类 并对宽度进行 !important 
+
+##### menu右侧内容并没有因为menu的伸缩而变宽
+
+每个人的布局不一样   我出现问题的原因是  左侧菜单栏固定 右侧内容区域设置margin-left - 左侧宽度，最后通过动态设置margin-left 解决问题
+
+##### 自己封装的svg组件和menu item项产生冲突 缩小之后图标消失
+
+deep穿透  把element-plus的样式减去一部分
+

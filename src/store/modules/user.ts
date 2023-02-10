@@ -1,11 +1,12 @@
 import { defineStore } from "pinia"
 import { login } from "@/api/sys"
 import md5 from "md5"
+import variables from "@/style/variables.module.scss"
 
 export default defineStore("user", {
     state: () => {
         return {
-            uu: 123
+            uu: 123,
         }
     },
     actions: {
@@ -35,4 +36,7 @@ export default defineStore("user", {
 
         }
     },
+    getters: {
+        cssVar: (state) => variables
+    }
 })
