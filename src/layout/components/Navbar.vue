@@ -1,6 +1,7 @@
 <template>
   <div class="navbar">
     <Hamburger class="hamburger-container"></Hamburger>
+    <Breadcrumb class="breadcrumb-container"></Breadcrumb>
     <div class="right-menu">
       <el-dropdown class="avatar-container">
         <div class="avatar-wrapper">
@@ -27,6 +28,7 @@
 import userPng from "@/assets/icon.png";
 import { Setting } from "@element-plus/icons-vue";
 import Hamburger from "@/components/hamburger/index.vue";
+import Breadcrumb from "@/components/Breadcrumb/index.vue";
 </script>
 
 <style lang="scss" scoped>
@@ -65,5 +67,8 @@ import Hamburger from "@/components/hamburger/index.vue";
       }
     }
   }
+}
+.breadcrumb-container {
+  float: left;
 }
 </style>

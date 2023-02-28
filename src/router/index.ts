@@ -14,6 +14,7 @@ const privateRoutes = [
     {
         path: '/user',
         component: demo3,
+        redirect: "/user/manage",
         meta: {
             title: "user",
             icon: "personnel"

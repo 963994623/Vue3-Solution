@@ -512,3 +512,127 @@ const { user, app } = pinia();
 
 deep穿透  把element-plus的样式减去一部分
 
+
+
+
+
+
+
+
+
+### 5.动态面包削 和 vue3 transition动画
+
+后台管理系统中常见的处理方案
+
+
+
+#### 5.1 使用route 获取当前路由链
+
+```
+// src/components/Breadcrumb/index.vue
+
+<script lang="ts" setup>
+import { watch, ref } from "vue";
+import { useRoute, useRouter, RouteRecordNormalized } from "vue-router";
+const route = useRoute();
+const router = useRouter();
+
+// 面包削数据
+const breadcrumData = ref<RouteRecordNormalized[]>([]);
+
+// 过滤不满足条件的面包削
+const getBreadcrumData = () => {
+  breadcrumData.value = route.matched.filter(
+    (item) => item.meta && item.meta.title
+  );
+};
+
+//面包削点击跳转
+const onLinkClick = (item) => {
+  router.push(item.path);
+};
+
+//侦听route的变化 让面包削数据随之变化 并开启第一次监听
+watch(
+  route,
+  () => {
+    getBreadcrumData();
+    console.log(breadcrumData.value);
+  },
+  {
+    immediate: true,
+  }
+);
+</script>
+```
+
+
+
+
+
+#### 5.2 使用 vue3 提供的TransitionGroup实现动画效果
+
+> vue3提供了两个动画组件 一个是Transition 另一个就是TransitionGroup ,后者用来对v-for的内容做渲染
+
+```
+// src/components/Breadcrumb/index.vue
+
+<template>
+  <el-breadcrumb class="breadcrumb" separator="/">
+    <TransitionGroup name="breadcrumb">
+      <el-breadcrumb-item
+        v-for="(item, index) in breadcrumData"
+        :key="item.path"
+      >
+        <span v-if="index === breadcrumData.length - 1" class="no-redirect">{{
+          item.meta.title
+        }}</span>
+        <span v-else class="redirect" @click="onLinkClick(item)">{{
+          item.meta.title
+        }}</span>
+      </el-breadcrumb-item>
+    </TransitionGroup>
+  </el-breadcrumb>
+</template>
+```
+
+
+
+#### 5.3 对出入动画进行定义
+
+> 5.2的框架已经搭好  根据transition的文档   transitionGroup 需要指定name 而name的值对应css类型的前缀
+
+```
+//src/style/transition.scss 
+// .breadcrumb就是前面定义的name 后面的则是动画的出入状态
+
+.breadcrumb-enter-active,
+.breadcrumb-move,
+.breadcrumb-leave-active{
+    transition: all .5s;
+    
+}
+.breadcrumb-enter-from,
+.breadcrumb-leave-to{
+    opacity: 0;
+    transform: translateX(20px);
+    
+}
+.breadcrumb-leave-active{
+    position: absolute;
+}
+
+```
+
+
+
+#### 5.4 全局引入 transition.scss
+
+```
+//src/style/index.scss
+
+在之前已经将index.scss 进行全局引入  所以只需要将transition.scss 在index.scss里引入即可
+
+@import "./transition.scss";
+```
+
