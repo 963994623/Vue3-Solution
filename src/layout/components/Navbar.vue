@@ -2,7 +2,9 @@
   <div class="navbar">
     <Hamburger class="hamburger-container"></Hamburger>
     <Breadcrumb class="breadcrumb-container"></Breadcrumb>
+
     <div class="right-menu">
+      <LangSelect class="right-menu-item hover-effect"></LangSelect>
       <el-dropdown class="avatar-container">
         <div class="avatar-wrapper">
           <el-avatar shape="square" :size="40" :src="userPng"></el-avatar>
@@ -29,6 +31,7 @@ import userPng from "@/assets/icon.png";
 import { Setting } from "@element-plus/icons-vue";
 import Hamburger from "@/components/hamburger/index.vue";
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
+import LangSelect from "@/components/LangSelect/index.vue";
 </script>
 
 <style lang="scss" scoped>
@@ -55,6 +58,16 @@ import Breadcrumb from "@/components/Breadcrumb/index.vue";
     float: right;
     padding-right: 16px;
 
+    :deep(.right-menu-item) {
+      display: inline-block;
+      padding: 0 18px 0 0;
+      font-size: 24px;
+      color: #5a5e66;
+      vertical-align: text-bottom;
+      &.hover-effect {
+        cursor: pointer;
+      }
+    }
     :deep(.avatar-container) {
       cursor: pointer;
       .avatar-wrapper {

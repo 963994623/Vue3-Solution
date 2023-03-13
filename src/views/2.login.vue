@@ -7,7 +7,7 @@
       ref="loginFormRef"
     >
       <div class="title-container">
-        <h3 class="title">用户登录</h3>
+        <h3 class="title">{{ $t("msg.login.title") }}</h3>
       </div>
       <!-- username -->
       <el-form-item prop="username">
@@ -43,7 +43,7 @@
         :loading="loading"
         type="primary"
         style="width: 100%; margin-bottom: 30px"
-        >登录</el-button
+        >{{ $t("msg.login.loginBtn") }}</el-button
       >
     </el-form>
   </div>
@@ -61,10 +61,13 @@ import { ref, onMounted, reactive } from "vue";
 import { validatePassword } from "../utils/rules";
 
 import useStore from "@/store/index";
+import { useI18n } from "vue-i18n";
 
 import { storeToRefs, mapActions } from "pinia";
 
 const { user } = useStore();
+
+const i18n = useI18n();
 
 onMounted(() => {});
 
@@ -78,7 +81,7 @@ const loginRules = ref<FormRules>({
     {
       required: true,
       trigger: "blur",
-      message: "用户名为必填项",
+      message: i18n.t("msg.login.usernameRule"),
     },
   ],
   password: [

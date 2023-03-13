@@ -31,8 +31,6 @@ import Sidebar from "./components/Sidebar/index.vue";
 import AppMain from "./components/AppMain.vue";
 import pinia from "@/store";
 const { app } = pinia();
-
-console.log(configColor);
 </script>
 
 <style lang="scss" scoped>

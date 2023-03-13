@@ -6,10 +6,11 @@
         :key="item.path"
       >
         <span v-if="index === breadcrumData.length - 1" class="no-redirect">{{
-          item.meta.title
+          // item.meta.title
+          generateTitle(item.meta.title as any)
         }}</span>
         <span v-else class="redirect" @click="onLinkClick(item)">{{
-          item.meta.title
+          generateTitle(item.meta.title as any)
         }}</span>
       </el-breadcrumb-item>
     </TransitionGroup>
@@ -20,6 +21,7 @@
 import { watch, ref } from "vue";
 import { useRoute, useRouter, RouteRecordNormalized } from "vue-router";
 import pinia from "@/store/index";
+import { generateTitle } from "@/utils/i18n";
 
 const route = useRoute();
 const router = useRouter();

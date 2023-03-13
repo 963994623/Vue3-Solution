@@ -19,7 +19,6 @@ const { app } = pinia();
 const router = useRouter();
 const filter = filterRoutes(router.getRoutes());
 const gener = generateMenus(filter);
-console.log(gener);
 </script>
 
 <style lang="scss" scoped>

@@ -2,9 +2,9 @@
 import useUserStore from "./modules/user"
 import useAppStore from "./modules/app"
 
-export default function useStore() {
+export default function useStore(pinia: null | any = null) {
     return {
-        user: useUserStore(),
-        app: useAppStore()
+        user: useUserStore(pinia),
+        app: useAppStore(pinia)
     }
 }

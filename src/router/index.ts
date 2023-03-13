@@ -24,7 +24,7 @@ const privateRoutes = [
                 path: "/user/manage",
                 component: () => import("@/views/3.user-manage.vue"),
                 meta: {
-                    title: "user<amage",
+                    title: "userManage",
                     icon: 'personnel-manage'
                 }
             },
@@ -59,7 +59,7 @@ const privateRoutes = [
             }
         ]
     }, {
-        path: "/artivle",
+        path: "/article",
         component: demo3,
         redirect: "/article/ranking",
         meta: {
@@ -71,7 +71,7 @@ const privateRoutes = [
                 path: "/article/ranking",
                 component: () => import("@/views/3.article-ranking.vue"),
                 meta: {
-                    title: "articleRnaking",
+                    title: "articleRanking",
                     icon: 'article-ranking'
                 }
             },
@@ -118,7 +118,7 @@ const publicRoutes = [
                 path: "/demo3/401",
                 component: () => import("@/views/3.error-page.vue"),
 
-            },
+            }
 
         ]
     },
