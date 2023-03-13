@@ -636,3 +636,69 @@ watch(
 @import "./transition.scss";
 ```
 
+
+
+
+
+
+
+### 6.国际化处理
+
+
+
+#### 6.1 使用vue-i18n 来处理vue项目中的国际化问题
+
+```
+//src/i18n/index.ts
+
+//创建数据  在使用数据时 会根据当前的locale来决定使用哪部分的数据 en|zh
+const message = {
+    en: {
+        msg: {
+            ...enLocale
+        }
+    },
+    zh: {
+        msg: {
+            ...zhLocale
+        }
+    }
+}
+
+//动态决定是中文还是英文  使用pinia作为状态管理
+function getLanguage() {
+    return app && app.languageGetters
+}
+
+const locale = getLanguage() || "zh";
+
+
+//创建i18n 并导出 在main.ts中 使用vue.use进行安装
+
+const i18n = createI18n({
+    legacy: false,
+    globalInjection: true,
+    locale,
+    messages: message
+})
+export default i18n
+
+// main.ts
+import i18n from './i18n' //国际化处理
+app.use(i18n)
+
+```
+
+
+
+#### 6.2 使用国际化文字
+
+```
+//在vue文件中 直接使用$t() 渲染文字 
+注 不需要已en|zh 为前缀
+例 $t("msg.login.title")
+
+//在非vue文件中  需要将自己创建的文件引入   本项目中路径为//src/i18n/index.ts
+//然后使用i18n.global.t() 进行渲染文字
+```
+

@@ -37,7 +37,7 @@ const getBreadcrumData = () => {
 };
 
 //面包削点击跳转
-const onLinkClick = (item) => {
+const onLinkClick = (item: { path: string }) => {
   router.push(item.path);
 };
 
