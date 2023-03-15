@@ -1,7 +1,8 @@
 import { defineStore } from "pinia"
-import { login } from "@/api/sys"
+import themeStore from "@/store/modules/theme"
 import md5 from "md5"
 import variables from "@/style/variables.module.scss"
+import { generateColors } from "@/utils/theme"
 
 export default defineStore("user", {
     state: () => {
@@ -17,26 +18,15 @@ export default defineStore("user", {
          * @param userInfo 
          * @returns 
          */
-        login(userInfo: any) {
-
-            const { username, password } = userInfo
-            return new Promise((res, rej) => {
-                login({
-                    username,
-                    password: md5(password)
-                }).then(data => {
-                    res(data)
-                }).catch(err => {
-                    rej(err)
-                })
-            })
-        },
         demo() {
             console.log(33);
 
         }
     },
     getters: {
-        cssVar: (state) => variables
+        cssVar: (state) => ({
+            ...variables,
+            ...generateColors(themeStore().mainColorGet)
+        })
     }
 })

@@ -702,3 +702,242 @@ app.use(i18n)
 //然后使用i18n.global.t() 进行渲染文字
 ```
 
+
+
+### 7.主题色变更
+
+> 需要先了解需求   element-plus的主题色 和 自己写组件的主题色
+
+
+
+#### 7.1 element-plus的主题
+
+##### 7.1.1 使用element的取色组件获取一个颜色并使用pinia和本地做持久化状态管理
+
+```
+//src/store/modules/theme.ts
+
+import { defineStore } from "pinia"
+import { MAIN_COLOR, DEFAULT_COLOR } from "@/constant"
+
+export default defineStore("theme", {
+    state() {
+        return {
+            mainColor: localStorage.getItem(MAIN_COLOR) || DEFAULT_COLOR
+        }
+    },
+    actions: {
+        setMainColor(newColor: string) {
+            this.mainColor = newColor;
+            localStorage.setItem(MAIN_COLOR, newColor)
+        }
+    },
+    getters: {
+        mainColorGet: (state) => {
+            return state.mainColor
+        }
+    }
+})
+```
+
+
+
+##### 7.1.2 创建formula.json文件 用作后续插件的数据源
+
+```
+//src/constant/formula.json
+
+{
+    "shade-1":"color(primary shade(10%))",
+    "light-1":"color(primary tint(10%))",
+    "light-2":"color(primary tint(20%))",
+    "light-3":"color(primary tint(30%))",
+    "light-4":"color(primary tint(40%))",
+    "light-5":"color(primary tint(50%))",
+    "light-6":"color(primary tint(60%))",
+    "light-7":"color(primary tint(70%))",
+    "light-8":"color(primary tint(80%))",
+    "light-9":"color(primary tint(90%))",
+    "subMenuHover":"color(primary tint(70%))",
+    "subMenuBg":"color(primary tint(80%))",
+    "menuHover":"color(primary tint(90%))",
+    "menuBg":"color(primary)"
+}
+```
+
+
+
+##### 7.1.3 使用工具 rgb-hex 和 css-color-function
+
+> rgb-hex rgba转换16进制      css-color-function 将某个颜色添加或减少一定部分
+
+
+
+##### 7.1.4 将formula.json中的数据替换 
+
+```
+//src/utils/theme.ts
+
+// primary 为十六进制颜色 并将formula.json中的primary替换为传入的这个16进制颜色
+export const generateColors = (primary: string) => {
+    if (!primary) return;
+    const colors = {
+        primary
+    }
+    Object.keys(formula).forEach(key => {
+        const value = formula[key].replace(/primary/g, primary)
+        colors[key] = "#" + hex(color.convert(value))
+    })
+    return colors
+}
+//返回一个对象 对象内容为formula.json的原内容 不过里面的primary字符串换为16进制颜色
+```
+
+
+
+##### 7.1.5 请求当前版本element-plus的css文件 并将当前字典内容替换请求下来的css字符串对应的地方
+
+```
+//src/utils/theme.ts
+
+//获取当前版本的elementplus 的css样式表 并请求下来
+export const getOriginalStyle = async () => {
+    const url = `https://unpkg.com/element-plus@2.2.29/dist/index.css`
+    const { data } = await axios(url)
+    return getStyleTemplate(data)
+
+}
+
+
+// 将需要进行替换的色值打上标记
+const getStyleTemplate = (data: any) => {
+
+    const colorMap = {
+        "#3a8ee6": "shade-1",
+        "#409eff": "primary",
+        "53a8ff": "light-1",
+        "#66b1ff": "light-2",
+        "#79bbff": "light-3",
+        "#8cc5ff": "light-4",
+        "#a0cfff": "light-5",
+        "#b3d8ff": "light-6",
+        "#c6e2ff": "light-7",
+        "#c9ecff": "light-8",
+        "#ecf5ff": "light-9",
+    }
+    Object.keys(colorMap).forEach(key => {
+        const value = colorMap[key]
+        data = data.replace(new RegExp(key, "ig"), value)
+    })
+    return data
+}
+```
+
+
+
+##### 7.1.6 生成css字符串文件
+
+```
+//src/utils/theme.ts
+
+将css字符串进行全局匹配 匹配整个css字符串，如果有相应key值 将value值写入
+
+/**
+ * 根据主题色，生成最新的样式表
+ */
+export const generateNewStyle = async (parimaryColor: string) => {
+    //根据主色生成色值表
+    const colors: any = generateColors(parimaryColor)
+
+    // 获取当前element-plus 的默认样式表，并且把需要进行替换的色值打上标记
+    let cssText = await getOriginalStyle()
+
+    //遍历生成的是色值表 ， 在默认样式表 进行全局替换
+
+    Object.keys(colors).forEach((key) => {
+        cssText = cssText.replace(
+            new RegExp('(:|\\s+)' + key, "g"), '$1' + colors[key]
+        )
+    })
+    return cssText
+}
+```
+
+
+
+##### 7.1.7 写入进style标签内 利用内部大于外部的方式 写入style生效
+
+```
+//src/utils/theme.ts
+
+/**
+* 把生成得以昂视表写入到style中
+*/
+export const writeNewStyle = (newStyle: string) => {
+    const style = document.createElement('style')
+    style.innerText = newStyle
+    document.head.appendChild(style)
+}
+```
+
+
+
+##### 7.1.8 让主题色每次进入都显示
+
+```
+App.vue
+
+//generateNewStyle 拥有异步请求模块 所以需要使用异步的方式
+
+<script setup lang="ts">
+import pinia from "@/store";
+import { generateNewStyle, writeNewStyle } from "@/utils/theme";
+const { theme } = pinia();
+generateNewStyle(theme.mainColorGet).then((newStyle) => {
+  writeNewStyle(newStyle);
+});
+</script>
+
+<template>
+  <router-view></router-view>
+</template>
+
+<style scoped></style>
+
+```
+
+```
+//src/components/ThemeSelect/components/SelectColor.vue
+//每次点击切换颜色都会重置整体的颜色
+
+  const data = await generateNewStyle(mColor.value);
+  writeNewStyle(data);
+```
+
+
+
+
+
+
+
+
+
+#### 7.2 自己组件的主题
+
+
+
+##### 7.2.1  将获取的颜色表拿出 并存储到pinia里
+
+```
+//src/store/modules/user.ts
+//cssVar 不能直接等于varibles 而是将获取的颜色表也写进去 并放在下方作为覆盖
+//在使用的时候使用pinia里存储的就可以  :style="{ backgroundColor: user.cssVar.menuBg }"
+
+    getters: {
+        cssVar: (state) => ({
+            ...variables,
+            ...generateColors(themeStore().mainColorGet)
+        })
+    }
+```
+

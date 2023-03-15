@@ -6,7 +6,7 @@
     <!-- 左侧emun菜单 -->
     <Sidebar
       class="sidebar-container"
-      :style="{ backgroundColor: configColor.menuBg }"
+      :style="{ backgroundColor: user.cssVar.menuBg }"
     ></Sidebar>
     <div
       :class="[
@@ -30,7 +30,7 @@ import Navbar from "./components/Navbar.vue";
 import Sidebar from "./components/Sidebar/index.vue";
 import AppMain from "./components/AppMain.vue";
 import pinia from "@/store";
-const { app } = pinia();
+const { app, user } = pinia();
 </script>
 
 <style lang="scss" scoped>
