@@ -4,6 +4,8 @@
     <Breadcrumb class="breadcrumb-container"></Breadcrumb>
 
     <div class="right-menu">
+      <HandSearch class="right-menu-item hover-effect"></HandSearch>
+      <screenFull class="right-menu-item hover-effect"></screenFull>
       <themePicker class="right-menu-item hover-effect"></themePicker>
       <LangSelect class="right-menu-item hover-effect"></LangSelect>
       <el-dropdown class="avatar-container">
@@ -34,6 +36,8 @@ import Hamburger from "@/components/hamburger/index.vue";
 import Breadcrumb from "@/components/Breadcrumb/index.vue";
 import LangSelect from "@/components/LangSelect/index.vue";
 import themePicker from "@/components/ThemeSelect/index.vue";
+import screenFull from "@/components/Screenfull/index.vue";
+import HandSearch from "@/components/HeaderSearch/index.vue";
 </script>
 
 <style lang="scss" scoped>
